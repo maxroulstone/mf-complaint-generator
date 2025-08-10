@@ -71,7 +71,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           echo "Testing PDF password protection on Windows..."
-          echo "y" | echo "n" | echo "1" | .\complaint-generator.exe
+          echo "y`nn`n1" | .\complaint-generator.exe
           echo "PDF protection test completed successfully on Windows"
 
       - name: Clean up test files
@@ -111,7 +111,7 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           echo "Running comprehensive PDF test on ${{ matrix.os }}..."
-          printf "y\ny\n7\n5\n" | timeout 60s ./complaint-generator || echo "Test completed"
+          printf "y\ny\n7\n5\n" | ./complaint-generator || echo "Test completed"
 
           # Verify files were generated
           if ls *.msg 1> /dev/null 2>&1; then
@@ -127,7 +127,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           echo "Running comprehensive PDF test on Windows..."
-          echo y | echo y | echo 7 | echo 5 | .\complaint-generator.exe
+          echo "y`ny`n7`n5" | .\complaint-generator.exe
 
           # Verify files were generated
           if (Get-ChildItem -Filter "*.msg").Count -gt 0 {
@@ -143,11 +143,7 @@ jobs:
       - name: Test specific pdfcpu functionality
         run: |
           echo "Testing pdfcpu configuration fix on ${{ matrix.os }}..."
-          go run -ldflags "-X main.version=test" cmd/generator/main.go <<EOF || echo "Test completed"
-          y
-          n
-          1
-          EOF
+          printf "y\nn\n1\n" | go run -ldflags "-X main.version=test" cmd/generator/main.go || echo "Test completed"
         shell: bash
 
       - name: Clean up integration test files
