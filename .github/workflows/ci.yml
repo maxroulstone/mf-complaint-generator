@@ -130,10 +130,11 @@ jobs:
           echo "y`ny`n7`n5" | .\complaint-generator.exe
 
           # Verify files were generated
-          if (Get-ChildItem -Filter "*.msg").Count -gt 0 {
+          $msgFiles = Get-ChildItem -Filter "*.msg" -ErrorAction SilentlyContinue
+          if ($msgFiles.Count -gt 0) {
             Write-Host "Message files generated successfully on Windows"
             Write-Host "Generated files:"
-            Get-ChildItem -Filter "*.msg" | Select-Object -First 5 | Format-Table Name, Length
+            $msgFiles | Select-Object -First 5 | Format-Table Name, Length
           } else {
             Write-Host "No message files generated on Windows"
             exit 1
