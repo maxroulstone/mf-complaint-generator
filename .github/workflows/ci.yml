@@ -1,4 +1,4 @@
-name: CI/CD
+name: Motor Finance Complaint Generator CI/CD
 
 on:
   push:
@@ -8,17 +8,29 @@ on:
   release:
     types: [created]
 
+# Set permissions for GITHUB_TOKEN
+permissions:
+  contents: read
+  packages: write
+
+env:
+  GO_VERSION: "1.23"
+
 jobs:
   test:
+    name: Test Go ${{ matrix.go-version }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         go-version: ["1.21", "1.22", "1.23"]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Go
+      - name: Set up Go ${{ matrix.go-version }}
         uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
@@ -44,37 +56,42 @@ jobs:
         run: make demo
 
   build:
+    name: Build and Release
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     if: github.event_name == 'release'
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.23"
+          go-version: ${{ env.GO_VERSION }}
 
       - name: Build for multiple platforms
         run: |
           mkdir -p dist
 
-          # Build for different platforms        GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-linux-amd64 cmd/generator/main.go
-        GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-darwin-amd64 cmd/generator/main.go
-        GOOS=darwin GOARCH=arm64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-darwin-arm64 cmd/generator/main.go
-        GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-windows-amd64.exe cmd/generator/main.go
+          # Build for different platforms
+          GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-linux-amd64 cmd/generator/main.go
+          GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-darwin-amd64 cmd/generator/main.go
+          GOOS=darwin GOARCH=arm64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-darwin-arm64 cmd/generator/main.go
+          GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-windows-amd64.exe cmd/generator/main.go
 
           # Create checksums
           cd dist
           sha256sum * > checksums.txt
 
       - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./dist/
-          asset_name: release-assets
-          asset_content_type: application/zip
+          files: |
+            dist/mf-complaint-generator-*
+            dist/checksums.txt
+          token: ${{ secrets.GITHUB_TOKEN }}
