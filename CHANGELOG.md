@@ -8,10 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+
 - **CRITICAL**: Fixed PDF password protection - PDFs are now properly encrypted with the generated passwords
 - Resolved issue where `api.EncryptFile` was being called with `nil` configuration
 
 ### Changed
+
 - Enhanced CI/CD pipeline with automatic release creation
 - Auto-increment patch version on successful tests in main branch
 - Automated build and asset upload for new releases

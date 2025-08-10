@@ -76,17 +76,17 @@ jobs:
           # Get the latest tag, or start with v0.0.0 if no tags exist
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
-          
+
           # Extract version numbers
           VERSION=${LATEST_TAG#v}
           MAJOR=$(echo $VERSION | cut -d. -f1)
           MINOR=$(echo $VERSION | cut -d. -f2)
           PATCH=$(echo $VERSION | cut -d. -f3)
-          
+
           # Increment patch version
           NEW_PATCH=$((PATCH + 1))
           NEW_TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
-          
+
           echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
           echo "Previous tag: $LATEST_TAG"
           echo "New tag: $NEW_TAG"
@@ -101,19 +101,19 @@ jobs:
           name: Release ${{ steps.get_tag.outputs.new_tag }}
           body: |
             ## What's Changed
-            
+
             Auto-generated release from successful tests on main branch.
-            
+
             ### Features
             - Motor Finance Complaint Generator with PDF password protection
             - High-performance parallel processing
             - Interactive CLI with user-friendly prompts
             - Multiple email types (complaint, password, chaser)
-            
+
             ### Performance
             - 500+ cases/second on modern hardware
             - Auto-configured workers based on CPU cores
-            
+
             **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.get_tag.outputs.latest_tag }}...${{ steps.get_tag.outputs.new_tag }}
           draft: false
           prerelease: false
