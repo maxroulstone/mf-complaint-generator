@@ -9,6 +9,7 @@ import (
 	"github.com/jung-kurt/gofpdf"
 	"github.com/maxroulstone/mf-complaint-generator/pkg/person"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
 )
 
 func GenerateComplaintPDF(p person.FakePerson) ([]byte, error) {
@@ -101,7 +102,11 @@ func PasswordProtect(pdfData []byte, password string) ([]byte, error) {
 	defer os.Remove(tempOutput)
 	
 	// Create configuration with password settings
-	conf := api.NewDefaultConfiguration()
+	conf := api.LoadConfiguration()
+	if conf == nil {
+		// If LoadConfiguration returns nil, create a basic configuration
+		conf = &model.Configuration{}
+	}
 	conf.UserPW = password    // Password required to open the PDF
 	conf.OwnerPW = password   // Password for editing permissions
 	
