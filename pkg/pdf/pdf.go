@@ -101,12 +101,8 @@ func PasswordProtect(pdfData []byte, password string) ([]byte, error) {
 	defer os.Remove(tempInput)
 	defer os.Remove(tempOutput)
 	
-	// Create configuration with password settings
-	conf := api.LoadConfiguration()
-	if conf == nil {
-		// If LoadConfiguration returns nil, create a proper default configuration
-		conf = model.NewDefaultConfiguration()
-	}
+	// Create configuration with password settings - always use fresh default config
+	conf := model.NewDefaultConfiguration()
 	conf.UserPW = password    // Password required to open the PDF
 	conf.OwnerPW = password   // Password for editing permissions
 	
