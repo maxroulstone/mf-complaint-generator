@@ -104,8 +104,8 @@ func PasswordProtect(pdfData []byte, password string) ([]byte, error) {
 	// Create configuration with password settings
 	conf := api.LoadConfiguration()
 	if conf == nil {
-		// If LoadConfiguration returns nil, create a basic configuration
-		conf = &model.Configuration{}
+		// If LoadConfiguration returns nil, create a proper default configuration
+		conf = model.NewDefaultConfiguration()
 	}
 	conf.UserPW = password    // Password required to open the PDF
 	conf.OwnerPW = password   // Password for editing permissions
@@ -114,6 +114,11 @@ func PasswordProtect(pdfData []byte, password string) ([]byte, error) {
 	err = api.EncryptFile(tempInput, tempOutput, conf)
 	if err != nil {
 		return nil, fmt.Errorf("failed to encrypt PDF: %v", err)
+	}
+	
+	// Check if output file exists before reading
+	if _, err := os.Stat(tempOutput); os.IsNotExist(err) {
+		return nil, fmt.Errorf("encrypted PDF file was not created: %s", tempOutput)
 	}
 	
 	// Read protected PDF
