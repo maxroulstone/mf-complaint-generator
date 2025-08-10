@@ -55,18 +55,91 @@ jobs:
       - name: Run demo
         run: make demo
 
-  build:
-    name: Build and Release
+  auto-release:
+    name: Auto Release
     needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
-    if: github.event_name == 'release'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          # Get the latest tag, or start with v0.0.0 if no tags exist
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          
+          # Extract version numbers
+          VERSION=${LATEST_TAG#v}
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3)
+          
+          # Increment patch version
+          NEW_PATCH=$((PATCH + 1))
+          NEW_TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+          
+          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          echo "Previous tag: $LATEST_TAG"
+          echo "New tag: $NEW_TAG"
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_tag.outputs.new_tag }}
+          name: Release ${{ steps.get_tag.outputs.new_tag }}
+          body: |
+            ## What's Changed
+            
+            Auto-generated release from successful tests on main branch.
+            
+            ### Features
+            - Motor Finance Complaint Generator with PDF password protection
+            - High-performance parallel processing
+            - Interactive CLI with user-friendly prompts
+            - Multiple email types (complaint, password, chaser)
+            
+            ### Performance
+            - 500+ cases/second on modern hardware
+            - Auto-configured workers based on CPU cores
+            
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.get_tag.outputs.latest_tag }}...${{ steps.get_tag.outputs.new_tag }}
+          draft: false
+          prerelease: false
+
+  build:
+    name: Build and Release
+    needs: auto-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get release tag
+        id: get_release_tag
+        run: |
+          # Get the latest tag that was just created
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo "release_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "Building release: $LATEST_TAG"
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -78,10 +151,10 @@ jobs:
           mkdir -p dist
 
           # Build for different platforms
-          GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-linux-amd64 cmd/generator/main.go
-          GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-darwin-amd64 cmd/generator/main.go
-          GOOS=darwin GOARCH=arm64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-darwin-arm64 cmd/generator/main.go
-          GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=${{ github.ref_name }}" -o dist/mf-complaint-generator-windows-amd64.exe cmd/generator/main.go
+          GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=${{ steps.get_release_tag.outputs.release_tag }}" -o dist/mf-complaint-generator-linux-amd64 cmd/generator/main.go
+          GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=${{ steps.get_release_tag.outputs.release_tag }}" -o dist/mf-complaint-generator-darwin-amd64 cmd/generator/main.go
+          GOOS=darwin GOARCH=arm64 go build -ldflags "-X main.version=${{ steps.get_release_tag.outputs.release_tag }}" -o dist/mf-complaint-generator-darwin-arm64 cmd/generator/main.go
+          GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=${{ steps.get_release_tag.outputs.release_tag }}" -o dist/mf-complaint-generator-windows-amd64.exe cmd/generator/main.go
 
           # Create checksums
           cd dist
@@ -89,8 +162,8 @@ jobs:
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
+          tag_name: ${{ steps.get_release_tag.outputs.release_tag }}
           files: |
             dist/mf-complaint-generator-*
             dist/checksums.txt
