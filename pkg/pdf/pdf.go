@@ -100,17 +100,21 @@ func PasswordProtect(pdfData []byte, password string) ([]byte, error) {
 	defer os.Remove(tempInput)
 	defer os.Remove(tempOutput)
 	
-	// Apply password protection using basic api
-	err = api.EncryptFile(tempInput, tempOutput, nil)
+	// Create configuration with password settings
+	conf := api.LoadConfiguration()
+	conf.UserPW = password    // Password required to open the PDF
+	conf.OwnerPW = password   // Password for editing permissions
+	
+	// Apply password protection
+	err = api.EncryptFile(tempInput, tempOutput, conf)
 	if err != nil {
-		// If encryption fails, just return the original PDF
-		return pdfData, nil
+		return nil, fmt.Errorf("failed to encrypt PDF: %v", err)
 	}
 	
 	// Read protected PDF
 	protectedPDF, err := os.ReadFile(tempOutput)
 	if err != nil {
-		return pdfData, nil
+		return nil, fmt.Errorf("failed to read encrypted PDF: %v", err)
 	}
 	
 	return protectedPDF, nil
