@@ -78,9 +78,9 @@ jobs:
         if: always()
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            del /Q *.msg 2>nul || true
+            del /Q *.eml 2>nul || true
           else
-            rm -f *.msg
+            rm -f *.eml
           fi
         shell: bash
 
@@ -114,10 +114,10 @@ jobs:
           printf "y\ny\n7\n5\n" | ./complaint-generator || echo "Test completed"
 
           # Verify files were generated
-          if ls *.msg 1> /dev/null 2>&1; then
+          if ls *.eml 1> /dev/null 2>&1; then
             echo "Message files generated successfully on ${{ matrix.os }}"
             echo "Generated files:"
-            ls -la *.msg | head -5
+            ls -la *.eml | head -5
           else
             echo "No message files generated on ${{ matrix.os }}"
             exit 1
@@ -130,11 +130,11 @@ jobs:
           echo "y`ny`n7`n5" | .\complaint-generator.exe
 
           # Verify files were generated
-          $msgFiles = Get-ChildItem -Filter "*.msg" -ErrorAction SilentlyContinue
-          if ($msgFiles.Count -gt 0) {
+          $emlFiles = Get-ChildItem -Filter "*.eml" -ErrorAction SilentlyContinue
+          if ($emlFiles.Count -gt 0) {
             Write-Host "Message files generated successfully on Windows"
             Write-Host "Generated files:"
-            $msgFiles | Select-Object -First 5 | Format-Table Name, Length
+            $emlFiles | Select-Object -First 5 | Format-Table Name, Length
           } else {
             Write-Host "No message files generated on Windows"
             exit 1
@@ -151,9 +151,9 @@ jobs:
         if: always()
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            del /Q *.msg 2>nul || true
+            del /Q *.eml 2>nul || true
           else
-            rm -f *.msg
+            rm -f *.eml
           fi
         shell: bash
 
@@ -210,6 +210,7 @@ jobs:
             - **CRITICAL**: Fixed PDF password protection on Windows systems
             - Resolved pdfcpu configuration error that prevented encryption on Windows
             - Added robust nil-checking for configuration initialization
+            - **BREAKING**: Changed file extension from .msg to .eml for better cross-platform compatibility
 
             ### Features
             - Motor Finance Complaint Generator with PDF password protection
@@ -217,6 +218,7 @@ jobs:
             - Interactive CLI with user-friendly prompts
             - Multiple email types (complaint, password, chaser)
             - **Cross-platform compatibility** (Windows, macOS, Linux)
+            - **EML email format** - Compatible with all major email clients
 
             ### Performance
             - 500+ cases/second on modern hardware

@@ -19,9 +19,9 @@ install:
 # Clean build artifacts
 clean:
 	rm -rf bin/
-	rm -f case_*.msg
-	rm -f complaint_*.msg
-	rm -f email_*.msg
+	rm -f case_*.eml
+	rm -f complaint_*.eml
+	rm -f email_*.eml
 
 # Run tests
 test:
