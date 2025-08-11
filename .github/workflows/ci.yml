@@ -46,8 +46,8 @@ jobs:
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
-          # Install TDM-GCC for CGO support
-          choco install tdm-gcc -y
+          # Install MinGW-w64 for CGO support
+          choco install mingw -y
         shell: powershell
 
       - name: Set up Go ${{ matrix.go-version }}
@@ -130,8 +130,8 @@ jobs:
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
-          # Install TDM-GCC for CGO support
-          choco install tdm-gcc -y
+          # Install MinGW-w64 for CGO support
+          choco install mingw -y
         shell: powershell
 
       - name: Set up Go
