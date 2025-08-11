@@ -31,6 +31,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install system dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libc6-dev gcc build-essential
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          # Install only command line tools, not full Xcode
+          sudo xcode-select --install 2>/dev/null || echo "Command line tools already installed"
+
+      - name: Install system dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # Install TDM-GCC for CGO support
+          choco install tdm-gcc -y
+        shell: powershell
+
       - name: Set up Go ${{ matrix.go-version }}
         uses: actions/setup-go@v5
         with:
@@ -95,6 +114,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install system dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libc6-dev gcc build-essential
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          # Install only command line tools, not full Xcode
+          sudo xcode-select --install 2>/dev/null || echo "Command line tools already installed"
+
+      - name: Install system dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # Install TDM-GCC for CGO support
+          choco install tdm-gcc -y
+        shell: powershell
 
       - name: Set up Go
         uses: actions/setup-go@v5
