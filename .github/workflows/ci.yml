@@ -66,9 +66,15 @@ jobs:
           printf "y\nn\n1\n" | ./complaint-generator${{ matrix.os == 'windows-latest' && '.exe' || '' }}
           echo "PDF generation test completed successfully on ${{ matrix.os }}"
 
-      - name: Clean up test files
-        if: always()
+      - name: Clean up test files (Windows)
+        if: always() && runner.os == 'Windows'
+        run: Get-ChildItem -Filter "*.eml" -ErrorAction SilentlyContinue | Remove-Item -Force
+        shell: pwsh
+
+      - name: Clean up test files (Unix)
+        if: always() && runner.os != 'Windows'
         run: rm -f *.eml
+        shell: bash
 
   cross-platform-integration:
     name: Cross-Platform PDF Integration Test
@@ -108,9 +114,15 @@ jobs:
             exit 1
           fi
 
-      - name: Clean up integration test files
-        if: always()
+      - name: Clean up integration test files (Windows)
+        if: always() && runner.os == 'Windows'
+        run: Get-ChildItem -Filter "*.eml" -ErrorAction SilentlyContinue | Remove-Item -Force
+        shell: pwsh
+
+      - name: Clean up integration test files (Unix)
+        if: always() && runner.os != 'Windows'
         run: rm -f *.eml
+        shell: bash
 
   auto-release:
     name: Auto Release
