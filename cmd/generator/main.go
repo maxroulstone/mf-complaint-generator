@@ -213,17 +213,10 @@ func generateCase(caseNum int, options Options) CaseResult {
 	result.PDFPassword = pdfPassword
 	result.ZipPassword = zipPassword
 	
-	// Generate complaint PDF
-	pdfData, err := pdf.GenerateComplaintPDF(p)
+	// Generate complaint PDF with password protection
+	protectedPDF, err := pdf.GenerateComplaintPDFWithPassword(p, pdfPassword)
 	if err != nil {
 		result.Error = fmt.Errorf("failed to generate PDF: %v", err)
-		return result
-	}
-	
-	// Password protect the PDF
-	protectedPDF, err := pdf.PasswordProtect(pdfData, pdfPassword)
-	if err != nil {
-		result.Error = fmt.Errorf("failed to password protect PDF: %v", err)
 		return result
 	}
 	
