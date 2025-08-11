@@ -90,7 +90,9 @@ func GenerateComplaintPDFWithPassword(p person.FakePerson, password string) ([]b
 	
 	// Set password protection before adding content
 	if password != "" {
-		pdf.SetProtection(gofpdf.CnProtectPrint|gofpdf.CnProtectCopy, "", password)
+		// In gofpdf, the SetProtection parameters are: (privFlag, userPass, ownerPass)
+		// We want to require the password to open the document, so we set it as userPass
+		pdf.SetProtection(gofpdf.CnProtectPrint|gofpdf.CnProtectCopy, password, "")
 	}
 	
 	pdf.AddPage()
