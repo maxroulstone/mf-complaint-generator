@@ -242,11 +242,11 @@ func generateCase(caseNum int, options Options) CaseResult {
 	
 	// Generate main complaint email
 	msgContent := email.CreateComplaintMsg(p, zipData, options.PasswordInEmail, pdfPassword, zipPassword)
-	filename := fmt.Sprintf("case_%02d_complaint_%s_%s_%d.msg", caseNum, p.FirstName, p.LastName, time.Now().UnixNano())
+	filename := fmt.Sprintf("case_%02d_complaint_%s_%s_%d.eml", caseNum, p.FirstName, p.LastName, time.Now().UnixNano())
 	
 	err = os.WriteFile(filename, []byte(msgContent), 0644)
 	if err != nil {
-		result.Error = fmt.Errorf("failed to write complaint MSG file: %v", err)
+		result.Error = fmt.Errorf("failed to write complaint EML file: %v", err)
 		return result
 	}
 	result.ComplaintFile = filename
@@ -254,11 +254,11 @@ func generateCase(caseNum int, options Options) CaseResult {
 	// Generate separate password email if needed
 	if !options.PasswordInEmail {
 		passwordMsgContent := email.CreatePasswordMsg(p, pdfPassword, zipPassword)
-		passwordFilename := fmt.Sprintf("case_%02d_passwords_%s_%s_%d.msg", caseNum, p.FirstName, p.LastName, time.Now().UnixNano())
+		passwordFilename := fmt.Sprintf("case_%02d_passwords_%s_%s_%d.eml", caseNum, p.FirstName, p.LastName, time.Now().UnixNano())
 		
 		err = os.WriteFile(passwordFilename, []byte(passwordMsgContent), 0644)
 		if err != nil {
-			result.Error = fmt.Errorf("failed to write password MSG file: %v", err)
+			result.Error = fmt.Errorf("failed to write password EML file: %v", err)
 			return result
 		}
 		result.PasswordFile = passwordFilename
@@ -267,11 +267,11 @@ func generateCase(caseNum int, options Options) CaseResult {
 	// Generate chaser email if needed
 	if options.GenerateChaser {
 		chaserMsgContent := email.CreateChaserMsg(p, options.ChaserDaysDelay)
-		chaserFilename := fmt.Sprintf("case_%02d_chaser_%s_%s_%d.msg", caseNum, p.FirstName, p.LastName, time.Now().UnixNano())
+		chaserFilename := fmt.Sprintf("case_%02d_chaser_%s_%s_%d.eml", caseNum, p.FirstName, p.LastName, time.Now().UnixNano())
 		
 		err = os.WriteFile(chaserFilename, []byte(chaserMsgContent), 0644)
 		if err != nil {
-			result.Error = fmt.Errorf("failed to write chaser MSG file: %v", err)
+			result.Error = fmt.Errorf("failed to write chaser EML file: %v", err)
 			return result
 		}
 		result.ChaserFile = chaserFilename

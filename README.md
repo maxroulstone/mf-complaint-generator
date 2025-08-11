@@ -154,10 +154,22 @@ You can customize:
 Each case generates up to 3 files:
 
 ```
-case_01_complaint_John_Smith_1234567890.msg    # Main complaint with ZIP attachment
-case_01_passwords_John_Smith_1234567890.msg    # Separate passwords (optional)
-case_01_chaser_John_Smith_1234567890.msg       # Follow-up email (optional)
+case_01_complaint_John_Smith_1234567890.eml    # Main complaint with ZIP attachment
+case_01_passwords_John_Smith_1234567890.eml    # Separate passwords (optional)
+case_01_chaser_John_Smith_1234567890.eml       # Follow-up email (optional)
 ```
+
+### EML Format Compatibility
+
+The generated `.eml` files use standard RFC 2822 email format with MIME multipart structure, making them compatible with:
+
+- **Windows**: Outlook, Windows Mail, Thunderbird
+- **macOS**: Mail.app, Outlook, Thunderbird
+- **Linux**: Thunderbird, Evolution, KMail
+- **Web**: Most webmail clients can import EML files
+- **Email servers**: Can be directly imported into most email systems
+
+The files contain proper email headers (From, To, Subject, Date) and MIME boundaries for attachments, ensuring broad compatibility across email clients and platforms.
 
 ## Architecture
 

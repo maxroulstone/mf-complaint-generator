@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **BREAKING**: Changed file extension from `.msg` to `.eml` for better cross-platform compatibility
+- Email files now use proper EML format (RFC 2822) instead of MSG format
 - Enhanced CI/CD pipeline with automatic release creation
 - Auto-increment patch version on successful tests in main branch
 - Automated build and asset upload for new releases

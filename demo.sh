@@ -62,17 +62,17 @@ echo ""
 # Show generated files
 echo "Generated Files:"
 echo "==============="
-ls -la *.msg | head -10
+ls -la *.eml | head -10
 echo ""
-echo "Total files generated: $(ls *.msg | wc -l)"
+echo "Total files generated: $(ls *.eml | wc -l)"
 echo ""
 
 # File analysis
 echo "File Analysis:"
 echo "============="
-complaint_files=$(ls case_*_complaint_*.msg | wc -l)
-password_files=$(ls case_*_passwords_*.msg 2>/dev/null | wc -l || echo "0")
-chaser_files=$(ls case_*_chaser_*.msg 2>/dev/null | wc -l || echo "0")
+complaint_files=$(ls case_*_complaint_*.eml | wc -l)
+password_files=$(ls case_*_passwords_*.eml 2>/dev/null | wc -l || echo "0")
+chaser_files=$(ls case_*_chaser_*.eml 2>/dev/null | wc -l || echo "0")
 
 echo "Complaint emails: $complaint_files"
 echo "Password emails: $password_files"
@@ -83,7 +83,7 @@ echo ""
 echo "Demo complete! Would you like to clean up generated files? (y/n)"
 read -r cleanup_choice
 if [[ $cleanup_choice =~ ^[Yy]$ ]]; then
-    rm -f *.msg
+    rm -f *.eml
     echo "Cleanup complete"
 else
     echo "Files preserved for inspection"
