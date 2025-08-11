@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **CRITICAL**: Fixed PDF password protection - PDFs are now properly encrypted with the generated passwords
+- **CRITICAL**: Fixed pdfcpu validation mode error preventing PDF encryption on macOS and other platforms
 - Resolved issue where `api.EncryptFile` was being called with `nil` configuration
+- Added explicit validation mode setting to prevent "invalid validationMode" errors
 
 ### Changed
 

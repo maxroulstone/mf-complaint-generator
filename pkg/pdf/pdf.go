@@ -103,6 +103,7 @@ func PasswordProtect(pdfData []byte, password string) ([]byte, error) {
 	
 	// Create configuration with password settings - always use fresh default config
 	conf := model.NewDefaultConfiguration()
+	conf.ValidationMode = model.ValidationRelaxed  // Set explicit validation mode
 	conf.UserPW = password    // Password required to open the PDF
 	conf.OwnerPW = password   // Password for editing permissions
 	
